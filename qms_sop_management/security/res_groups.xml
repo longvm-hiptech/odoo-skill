@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Define the module category -->
+    <record id="module_category_qms" model="ir.module.category">
+        <field name="name">QMS Document Control</field>
+        <field name="description">Quality Management System (SOP &amp; Document Control) access levels.</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <!-- Odoo 19: Define a privilege linking to the QMS category -->
+    <record model="res.groups.privilege" id="res_groups_privilege_qms">
+        <field name="name">QMS Access Level</field>
+        <field name="sequence">10</field>
+        <field name="category_id" ref="module_category_qms"/>
+    </record>
+
+    <!-- Define the groups linking to the privilege instead of the category -->
+    <record id="group_qms_user" model="res.groups">
+        <field name="name">Employee</field>
+        <field name="privilege_id" ref="res_groups_privilege_qms"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_qms_coordinator" model="res.groups">
+        <field name="name">Department Coordinator</field>
+        <field name="privilege_id" ref="res_groups_privilege_qms"/>
+        <field name="implied_ids" eval="[(4, ref('group_qms_user'))]"/>
+    </record>
+
+    <record id="group_qms_manager" model="res.groups">
+        <field name="name">Department Manager</field>
+        <field name="privilege_id" ref="res_groups_privilege_qms"/>
+        <field name="implied_ids" eval="[(4, ref('group_qms_coordinator'))]"/>
+    </record>
+
+    <record id="group_qms_qa" model="res.groups">
+        <field name="name">QA Specialist</field>
+        <field name="privilege_id" ref="res_groups_privilege_qms"/>
+        <field name="implied_ids" eval="[(4, ref('group_qms_coordinator'))]"/>
+    </record>
+</odoo>

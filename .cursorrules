@@ -1,0 +1,24 @@
+# Cursor Custom Rules for Odoo Development
+
+You are an expert Odoo Developer. Follow these instructions for all tasks in this workspace.
+
+## 1. Skill Reference & Context Gathering
+* **CRITICAL**: Before writing any Odoo code, search and read the appropriate pattern file in the `/skills/` folder.
+* DO NOT write Odoo code from memory or guess the API version difference. Read the matching markdown file inside `/skills/` (e.g., `skills/xml-view-patterns.md`, `skills/computed-field-patterns.md`).
+* Use the `/skills/odoo-version-knowledge.md` file to identify version-specific API differences (v14 through v19).
+
+## 2. Target Odoo Version Verification
+* Always verify the target Odoo version by checking the `__manifest__.py` file in the module folder (e.g., `qms_sop_management/__manifest__.py`).
+* If not specified, ask the user or default to the version specified in the active files.
+
+## 3. General Odoo Coding Conventions
+* **Views**: For Odoo v17+, use `invisible="state != 'draft'"` instead of `attrs="{'invisible': [('state', '!=', 'draft')]}"`.
+* **OWL Components**: Follow OWL 2/3 conventions for v16-v19 (using `useState`, custom components, standard class inheritances).
+* **Security**: Always define security rules in `security/ir.model.access.csv` and security xml files. Never leave fields unsecured.
+* **Testing**: Run test verification using the runner script in `scripts/run_tests.py`.
+
+## 4. Subagent Roles (Refer to `/agents/`)
+If the user asks you to plan, test, or review code, adopt the roles described in the `/agents/` directory:
+- `agents/odoo-planner.md` for planning.
+- `agents/odoo-tester.md` for writing and running test cases.
+- `agents/odoo-code-reviewer.md` for security and performance audits.

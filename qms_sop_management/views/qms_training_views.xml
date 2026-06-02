@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Training Plan Action -->
+    <record id="action_qms_sop_training_plan" model="ir.actions.act_window">
+        <field name="name">SOP Training Plans</field>
+        <field name="res_model">qms.sop.training.plan</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new Training Plan
+            </p>
+            <p>
+                Set up mandatory training schedules for employees on approved SOPs before they become effective.
+            </p>
+        </field>
+    </record>
+
+    <!-- Training Plan List View -->
+    <record id="view_qms_sop_training_plan_list" model="ir.ui.view">
+        <field name="name">qms.sop.training.plan.list</field>
+        <field name="model">qms.sop.training.plan</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'draft'" decoration-warning="state == 'active'" decoration-success="state == 'completed'">
+                <field name="name"/>
+                <field name="sop_id"/>
+                <field name="coordinator_id" widget="many2one_avatar_user"/>
+                <field name="deadline"/>
+                <field name="state" widget="badge" decoration-success="state == 'completed'" decoration-warning="state == 'active'" decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Training Plan Form View -->
+    <record id="view_qms_sop_training_plan_form" model="ir.ui.view">
+        <field name="name">qms.sop.training.plan.form</field>
+        <field name="model">qms.sop.training.plan</field>
+        <field name="arch" type="xml">
+            <form string="Training Plan">
+                <header>
+                    <button name="action_activate" string="Activate Plan" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group string="Basic Info">
+                        <group>
+                            <field name="sop_id" readonly="state != 'draft'"/>
+                            <field name="coordinator_id" widget="many2one_avatar_user" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="deadline" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Target Employees" name="employees" invisible="state != 'draft'">
+                            <field name="employee_ids" widget="many2many" readonly="state != 'draft'"/>
+                        </page>
+                        <page string="Training Execution" name="records" invisible="state == 'draft'">
+                            <field name="record_ids" readonly="1">
+                                <list>
+                                    <field name="user_id" widget="many2one_avatar_user"/>
+                                    <field name="state" widget="badge" decoration-success="state == 'passed'" decoration-warning="state == 'pending'" decoration-danger="state == 'failed'"/>
+                                    <field name="date_completed"/>
+                                    <button name="action_pass" string="Pass" type="object" class="btn-success" invisible="state == 'passed'" icon="fa-check"/>
+                                    <button name="action_fail" string="Fail" type="object" class="btn-danger" invisible="state == 'failed'" icon="fa-times"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Training Plan Search View -->
+    <record id="view_qms_sop_training_plan_search" model="ir.ui.view">
+        <field name="name">qms.sop.training.plan.search</field>
+        <field name="model">qms.sop.training.plan</field>
+        <field name="arch" type="xml">
+            <search string="Search Training Plans">
+                <field name="name"/>
+                <field name="sop_id"/>
+                <field name="coordinator_id"/>
+                <filter name="my_coordinated" string="My Coordinated" domain="[('coordinator_id', '=', uid)]"/>
+                <separator/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="active" string="In Progress" domain="[('state', '=', 'active')]"/>
+                <filter name="completed" string="Completed" domain="[('state', '=', 'completed')]"/>
+                <group>
+                    <filter name="group_sop" string="SOP" context="{'group_by': 'sop_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_coordinator" string="Coordinator" context="{'group_by': 'coordinator_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

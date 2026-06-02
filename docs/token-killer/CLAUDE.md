@@ -29,7 +29,7 @@ agents/
 ## Development Commands
 
 ```bash
-cd plugins/odoo-token-killer/skills/otk-core
+cd docs/token-killer/skills/otk-core
 
 # Build
 cargo build --release

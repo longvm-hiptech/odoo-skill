@@ -77,3 +77,12 @@ ERRORS.md
 
 # Archives
 *.zip
+
+# Ignore specific development/private folders
+plugins/
+data/
+git_repo/
+*.db
+*.sqlite
+*.sqlite3
+*.log

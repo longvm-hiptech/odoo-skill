@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Loss Report Action -->
+    <record id="action_qms_sop_loss" model="ir.actions.act_window">
+        <field name="name">SOP Document Loss Reports</field>
+        <field name="res_model">qms.sop.loss</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                File a new Loss Report
+            </p>
+            <p>
+                Record lost paper copies of SOPs and keep notes on QA resolution.
+            </p>
+        </field>
+    </record>
+
+    <!-- Loss Report List View -->
+    <record id="view_qms_sop_loss_list" model="ir.ui.view">
+        <field name="name">qms.sop.loss.list</field>
+        <field name="model">qms.sop.loss</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'draft'" decoration-warning="state == 'reported'" decoration-success="state == 'resolved'">
+                <field name="name"/>
+                <field name="sop_id"/>
+                <field name="sop_code"/>
+                <field name="reporter_id" widget="many2one_avatar_user"/>
+                <field name="loss_date"/>
+                <field name="state" widget="badge" decoration-success="state == 'resolved'" decoration-warning="state == 'reported'" decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Loss Report Form View -->
+    <record id="view_qms_sop_loss_form" model="ir.ui.view">
+        <field name="name">qms.sop.loss.form</field>
+        <field name="model">qms.sop.loss</field>
+        <field name="arch" type="xml">
+            <form string="SOP Loss Report">
+                <header>
+                    <button name="action_report" string="Report to QA" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_resolve" string="Resolve Loss" type="object" class="btn-success" invisible="state != 'reported'" groups="qms_sop_management.group_qms_qa"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,reported,resolved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group string="Incident Info">
+                        <group>
+                            <field name="sop_id" readonly="state != 'draft'"/>
+                            <field name="sop_code"/>
+                        </group>
+                        <group>
+                            <field name="reporter_id" widget="many2one_avatar_user" readonly="state != 'draft'"/>
+                            <field name="loss_date" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group string="Incident Description">
+                        <field name="description" placeholder="Describe how the document was lost..." readonly="state != 'draft'"/>
+                    </group>
+                    <group string="QA Resolution" invisible="state == 'draft'">
+                        <field name="resolution_notes" placeholder="Describe steps taken to resolve (e.g. invalidating copy number, reissuing)..." readonly="state == 'resolved'"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Loss Report Search View -->
+    <record id="view_qms_sop_loss_search" model="ir.ui.view">
+        <field name="name">qms.sop.loss.search</field>
+        <field name="model">qms.sop.loss</field>
+        <field name="arch" type="xml">
+            <search string="Search Loss Reports">
+                <field name="name"/>
+                <field name="sop_id"/>
+                <field name="reporter_id"/>
+                <filter name="my_reports" string="My Reports" domain="[('reporter_id', '=', uid)]"/>
+                <separator/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="reported" string="Reported" domain="[('state', '=', 'reported')]"/>
+                <filter name="resolved" string="Resolved" domain="[('state', '=', 'resolved')]"/>
+                <group>
+                    <filter name="group_sop" string="SOP" context="{'group_by': 'sop_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_reporter" string="Reporter" context="{'group_by': 'reporter_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

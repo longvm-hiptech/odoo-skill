@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Multi-Company Rules for QMS Models -->
+        <record id="rule_qms_sop_company" model="ir.rule">
+            <field name="name">QMS SOP: Multi-Company Rule</field>
+            <field name="model_id" ref="model_qms_sop"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[
+                '|',
+                ('company_id', '=', False),
+                ('company_id', 'in', company_ids)
+            ]</field>
+        </record>
+
+        <record id="rule_qms_change_control_company" model="ir.rule">
+            <field name="name">QMS Change Control: Multi-Company Rule</field>
+            <field name="model_id" ref="model_qms_change_control"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[
+                '|',
+                ('company_id', '=', False),
+                ('company_id', 'in', company_ids)
+            ]</field>
+        </record>
+
+        <record id="rule_qms_sop_form_company" model="ir.rule">
+            <field name="name">QMS SOP Form: Multi-Company Rule</field>
+            <field name="model_id" ref="model_qms_sop_form"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[
+                '|',
+                ('company_id', '=', False),
+                ('company_id', 'in', company_ids)
+            ]</field>
+        </record>
+
+        <record id="rule_qms_sop_logbook_company" model="ir.rule">
+            <field name="name">QMS SOP Logbook: Multi-Company Rule</field>
+            <field name="model_id" ref="model_qms_sop_logbook"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[
+                '|',
+                ('company_id', '=', False),
+                ('company_id', 'in', company_ids)
+            ]</field>
+        </record>
+
+        <record id="rule_qms_sop_distribution_company" model="ir.rule">
+            <field name="name">QMS SOP Distribution: Multi-Company Rule</field>
+            <field name="model_id" ref="model_qms_sop_distribution"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[
+                '|',
+                ('company_id', '=', False),
+                ('company_id', 'in', company_ids)
+            ]</field>
+        </record>
+
+        <record id="rule_qms_sop_loss_company" model="ir.rule">
+            <field name="name">QMS SOP Loss: Multi-Company Rule</field>
+            <field name="model_id" ref="model_qms_sop_loss"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[
+                '|',
+                ('company_id', '=', False),
+                ('company_id', 'in', company_ids)
+            ]</field>
+        </record>
+
+        <record id="rule_qms_sop_spell_company" model="ir.rule">
+            <field name="name">QMS SOP Spell: Multi-Company Rule</field>
+            <field name="model_id" ref="model_qms_sop_spell"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[
+                '|',
+                ('company_id', '=', False),
+                ('company_id', 'in', company_ids)
+            ]</field>
+        </record>
+
+        <record id="rule_qms_sop_training_plan_company" model="ir.rule">
+            <field name="name">QMS SOP Training Plan: Multi-Company Rule</field>
+            <field name="model_id" ref="model_qms_sop_training_plan"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[
+                '|',
+                ('company_id', '=', False),
+                ('company_id', 'in', company_ids)
+            ]</field>
+        </record>
+
+        <record id="rule_qms_sop_training_record_company" model="ir.rule">
+            <field name="name">QMS SOP Training Record: Multi-Company Rule</field>
+            <field name="model_id" ref="model_qms_sop_training_record"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[
+                '|',
+                ('company_id', '=', False),
+                ('company_id', 'in', company_ids)
+            ]</field>
+        </record>
+    </data>
+</odoo>

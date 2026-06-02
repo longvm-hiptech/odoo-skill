@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Change Control Action -->
+    <record id="action_qms_change_control" model="ir.actions.act_window">
+        <field name="name">Change Controls</field>
+        <field name="res_model">qms.change.control</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new Change Control Request
+            </p>
+            <p>
+                Track changes to SOP documents and approvals before new editions are drafted.
+            </p>
+        </field>
+    </record>
+
+    <!-- Change Control List View -->
+    <record id="view_qms_change_control_list" model="ir.ui.view">
+        <field name="name">qms.change.control.list</field>
+        <field name="model">qms.change.control</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'draft'" decoration-warning="state == 'submitted'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'">
+                <field name="name"/>
+                <field name="requester_id" widget="many2one_avatar_user"/>
+                <field name="request_date"/>
+                <field name="description" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'approved'" decoration-warning="state == 'submitted'" decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Change Control Form View -->
+    <record id="view_qms_change_control_form" model="ir.ui.view">
+        <field name="name">qms.change.control.form</field>
+        <field name="model">qms.change.control</field>
+        <field name="arch" type="xml">
+            <form string="Change Control">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object" class="btn-success" invisible="state != 'submitted'" groups="qms_sop_management.group_qms_qa"/>
+                    <button name="action_reject" string="Reject" type="object" class="btn-danger" invisible="state != 'submitted'" groups="qms_sop_management.group_qms_qa"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="requester_id" widget="many2one_avatar_user" readonly="state != 'draft'"/>
+                            <field name="request_date" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group string="Change Specifications">
+                        <field name="description" placeholder="Describe the change..." readonly="state != 'draft'"/>
+                        <field name="reason" placeholder="Provide reason for this change..." readonly="state != 'draft'"/>
+                    </group>
+                    <notebook>
+                        <page string="Affected SOPs" name="sops">
+                            <field name="sop_ids" readonly="1">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="building_code"/>
+                                    <field name="dept_code"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Change Control Search View -->
+    <record id="view_qms_change_control_search" model="ir.ui.view">
+        <field name="name">qms.change.control.search</field>
+        <field name="model">qms.change.control</field>
+        <field name="arch" type="xml">
+            <search string="Search Change Controls">
+                <field name="name"/>
+                <field name="description" filter_domain="[('description', 'ilike', self)]"/>
+                <field name="reason" filter_domain="[('reason', 'ilike', self)]"/>
+                <field name="requester_id"/>
+                <filter name="my_requests" string="My Requests" domain="[('requester_id', '=', uid)]"/>
+                <separator/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="submitted" string="Submitted" domain="[('state', '=', 'submitted')]"/>
+                <filter name="approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_requester" string="Requester" context="{'group_by': 'requester_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

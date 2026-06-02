@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Paper Format (Optional custom margins if needed, otherwise use Euro) -->
+    <record id="paperformat_qms_sop" model="report.paperformat">
+        <field name="name">QMS SOP Paper Format</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">30</field>
+        <field name="margin_bottom">20</field>
+        <field name="margin_left">15</field>
+        <field name="margin_right">15</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">25</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Report Action -->
+    <record id="action_report_qms_sop" model="ir.actions.report">
+        <field name="name">SOP Document Printout</field>
+        <field name="model">qms.sop</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">qms_sop_management.report_qms_sop_document</field>
+        <field name="report_file">qms_sop_management.report_qms_sop_document</field>
+        <field name="print_report_name">'SOP - %s' % (object.code or object.name)</field>
+        <field name="binding_model_id" ref="model_qms_sop"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_qms_sop"/>
+    </record>
+
+    <!-- QWeb Template -->
+    <template id="report_qms_sop_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Custom CSS for Watermark and QMS Layout -->
+                        <style>
+                            .qms-container {
+                                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                                color: #333;
+                            }
+                            .qms-header-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-bottom: 20px;
+                            }
+                            .qms-header-table td {
+                                border: 2px solid #333;
+                                padding: 10px;
+                                vertical-align: middle;
+                            }
+                            .qms-title-cell {
+                                text-align: center;
+                                font-weight: bold;
+                                font-size: 18px;
+                            }
+                            .qms-meta-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-bottom: 30px;
+                            }
+                            .qms-meta-table td, .qms-meta-table th {
+                                border: 1px solid #999;
+                                padding: 8px;
+                                font-size: 13px;
+                            }
+                            .qms-meta-table th {
+                                background-color: #f2f2f2;
+                                font-weight: bold;
+                                text-align: left;
+                            }
+                            .qms-section-title {
+                                font-size: 16px;
+                                font-weight: bold;
+                                border-bottom: 2px solid #333;
+                                padding-bottom: 5px;
+                                margin-top: 25px;
+                                margin-bottom: 10px;
+                                text-transform: uppercase;
+                            }
+                            .qms-watermark {
+                                position: fixed;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%) rotate(-45deg);
+                                font-size: 70px;
+                                color: rgba(180, 180, 180, 0.22);
+                                font-weight: bold;
+                                text-align: center;
+                                z-index: -1000;
+                                pointer-events: none;
+                                width: 100%;
+                                text-transform: uppercase;
+                                white-space: nowrap;
+                            }
+                            .qms-grid-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-bottom: 20px;
+                            }
+                            .qms-grid-table th, .qms-grid-table td {
+                                border: 1px solid #ddd;
+                                padding: 8px;
+                                font-size: 12px;
+                            }
+                            .qms-grid-table th {
+                                background-color: #f9f9f9;
+                                text-align: left;
+                            }
+                        </style>
+
+                        <!-- Dynamic Watermark Text Calculation -->
+                        <t t-set="watermark" t-value="context.get('print_type_label') or (
+                            'DRAFT' if doc.state == 'draft' else
+                            'UNDER REVIEW' if doc.state == 'review' else
+                            'APPROVED DRAFT' if doc.state == 'approve' else
+                            'MASTER COPY' if doc.state == 'effective' else
+                            'OBSOLETE' if doc.state == 'obsolete' else
+                            'TRAINING COPY'
+                        )"/>
+
+                        <!-- Watermark Overlay -->
+                        <div class="qms-watermark">
+                            <span t-esc="watermark"/>
+                        </div>
+
+                        <div class="qms-container">
+                            <!-- Document Header Box -->
+                            <table class="qms-header-table">
+                                <tr>
+                                    <td style="width: 25%; text-align: center;">
+                                        <strong>QUALITY SYSTEM</strong><br/>
+                                        <span>DOCUMENTATION</span>
+                                    </td>
+                                    <td class="qms-title-cell" style="width: 50%;">
+                                        STANDARD OPERATING PROCEDURE (SOP)<br/>
+                                        <span style="font-size: 16px; font-weight: normal;" t-field="doc.name"/>
+                                    </td>
+                                    <td style="width: 25%; font-size: 12px;">
+                                        <strong>Doc Code:</strong> <span t-out="doc.code or 'Draft'"/><br/>
+                                        <strong>Building:</strong> <span t-field="doc.building_code"/><br/>
+                                        <strong>Dept:</strong> <span t-field="doc.dept_code"/><br/>
+                                        <strong>Edition:</strong> <span t-field="doc.edition_num"/>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Document Metadata Summary -->
+                            <table class="qms-meta-table">
+                                <tr>
+                                    <th>Document Owner:</th>
+                                    <td><span t-field="doc.owner_id.name"/></td>
+                                    <th>QA Approver:</th>
+                                    <td><span t-field="doc.approver_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <th>Approval Date:</th>
+                                    <td><span t-field="doc.date_approved" t-options='{"widget": "date"}'/></td>
+                                    <th>Effective Date:</th>
+                                    <td><span t-field="doc.date_effective" t-options='{"widget": "date"}'/></td>
+                                </tr>
+                                <tr>
+                                    <th>Review Deadline:</th>
+                                    <td><span t-field="doc.date_review_deadline" t-options='{"widget": "date"}'/></td>
+                                    <th>Change Request:</th>
+                                    <td><span t-field="doc.change_control_id.name"/></td>
+                                </tr>
+                            </table>
+
+                            <!-- SOP Description -->
+                            <div class="qms-section-title">1. Document Description</div>
+                            <div style="font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
+                                <p>This standard operating procedure governs quality operations and compliance in building <span t-field="doc.building_code"/> for the <span t-field="doc.dept_code"/> department. All employees are required to complete mandatory training before implementing this procedure in production.</p>
+                            </div>
+
+                            <!-- Associated Forms -->
+                            <div class="qms-section-title">2. Associated Forms &amp; Appendices</div>
+                            <t t-if="doc.form_ids">
+                                <table class="qms-grid-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Form Code</th>
+                                            <th>Form Name</th>
+                                            <th>Type</th>
+                                            <th>Format</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="doc.form_ids" t-as="form">
+                                            <tr>
+                                                <td><span t-field="form.code"/></td>
+                                                <td><span t-field="form.name"/></td>
+                                                <td><span t-field="form.form_type"/></td>
+                                                <td>
+                                                    <t t-if="form.is_electronic">Electronic (Điện tử)</t>
+                                                    <t t-else="">Paper (Bản giấy)</t>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+                            <t t-else="">
+                                <p style="font-size: 13px; color: #666; font-style: italic;">No forms or appendices associated with this SOP.</p>
+                            </t>
+
+                            <!-- Associated Logbooks -->
+                            <div class="qms-section-title">3. Associated Logbooks</div>
+                            <t t-if="doc.logbook_ids">
+                                <table class="qms-grid-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Logbook Code</th>
+                                            <th>Logbook Name</th>
+                                            <th>Total Pages</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="doc.logbook_ids" t-as="logbook">
+                                            <tr>
+                                                <td><span t-field="logbook.code"/></td>
+                                                <td><span t-field="logbook.name"/></td>
+                                                <td><span t-field="logbook.page_count"/> pages</td>
+                                                <td><span t-field="logbook.state"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+                            <t t-else="">
+                                <p style="font-size: 13px; color: #666; font-style: italic;">No logbooks associated with this SOP.</p>
+                            </t>
+
+                            <!-- Controlled Copy Issuance Box (if printed as a copy) -->
+                            <div t-if="context.get('print_type_label')" style="border: 2px dashed #ff0000; padding: 15px; margin-top: 40px; background-color: #fff9f9;">
+                                <h4 style="color: #ff0000; margin-top: 0;">GMP CONTROLLED DOCUMENT PRINTOUT</h4>
+                                <table style="width: 100%; font-size: 12px; line-height: 1.6;">
+                                    <tr>
+                                        <td><strong>Issued To:</strong> <span t-out="context.get('print_recipient')"/></td>
+                                        <td><strong>Issued By:</strong> <span t-out="context.get('print_issuer')"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Print Type:</strong> <span t-out="context.get('print_type_label')"/></td>
+                                        <td><strong>Date Printed:</strong> <span t-out="context.get('print_date')"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2"><strong>Usage Location:</strong> <span t-out="context.get('print_location')"/></td>
+                                    </tr>
+                                </table>
+                                <p style="font-size: 10px; color: #555; margin-top: 10px; font-style: italic;">Note: This copy is registered for auditing purposes. Upon SOP revision or obsolescence, this copy must be returned to QA department for destruction.</p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

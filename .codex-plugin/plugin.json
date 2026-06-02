@@ -1,0 +1,11 @@
+{
+  "name": "odoo-development",
+  "description": "Comprehensive skill set for Odoo development, planning, testing, and security review across versions 14 to 19.",
+  "version": "1.0.0",
+  "defaultEnabled": true,
+  "author": {
+    "name": "qphat289"
+  },
+  "repository": "https://github.com/qphat289/odoo-skill.git",
+  "license": "MIT"
+}

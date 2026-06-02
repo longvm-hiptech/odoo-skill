@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Root Menu -->
+    <menuitem id="qms_root_menu"
+              name="QMS Document Control"
+              sequence="100"
+              web_icon="qms_sop_management,static/description/icon.png"/>
+
+    <!-- SOPs & Forms Category Submenu -->
+    <menuitem id="qms_sop_submenu"
+              name="SOPs &amp; Forms"
+              parent="qms_root_menu"
+              sequence="10"/>
+
+    <!-- Action Menus under SOPs & Forms -->
+    <menuitem id="qms_sop_menu_item"
+              name="SOP Documents"
+              parent="qms_sop_submenu"
+              action="action_qms_sop"
+              sequence="10"/>
+
+    <menuitem id="qms_sop_form_menu_item"
+              name="SOP Forms"
+              parent="qms_sop_submenu"
+              action="action_qms_sop_form"
+              sequence="20"/>
+
+    <menuitem id="qms_sop_logbook_menu_item"
+              name="SOP Logbooks"
+              parent="qms_sop_submenu"
+              action="action_qms_sop_logbook"
+              sequence="30"/>
+
+    <!-- Operations Submenu -->
+    <menuitem id="qms_operations_submenu"
+              name="Operations"
+              parent="qms_root_menu"
+              sequence="20"/>
+
+    <!-- Action Menus under Operations -->
+    <menuitem id="qms_sop_distribution_menu_item"
+              name="Copy Distributions"
+              parent="qms_operations_submenu"
+              action="action_qms_sop_distribution"
+              sequence="10"/>
+
+    <menuitem id="qms_change_control_menu_item"
+              name="Change Controls"
+              parent="qms_operations_submenu"
+              action="action_qms_change_control"
+              sequence="20"/>
+
+    <menuitem id="qms_sop_loss_menu_item"
+              name="Loss Reports"
+              parent="qms_operations_submenu"
+              action="action_qms_sop_loss"
+              sequence="30"/>
+
+    <menuitem id="qms_sop_spell_menu_item"
+              name="Spelling Corrections"
+              parent="qms_operations_submenu"
+              action="action_qms_sop_spell"
+              sequence="40"/>
+
+    <!-- Training Submenu -->
+    <menuitem id="qms_training_submenu"
+              name="Training"
+              parent="qms_root_menu"
+              sequence="30"/>
+
+    <!-- Action Menus under Training -->
+    <menuitem id="qms_sop_training_plan_menu_item"
+              name="Training Plans"
+              parent="qms_training_submenu"
+              action="action_qms_sop_training_plan"
+              sequence="10"/>
+</odoo>

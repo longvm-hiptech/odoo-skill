@@ -1,0 +1,15 @@
+{
+  "agent_id": "odoo-developer",
+  "name": "Odoo Development Agent",
+  "system_instructions_file": "./SKILL.md",
+  "skills_directory": "./skills",
+  "agents_directory": "./agents",
+  "commands_directory": "./commands",
+  "tools": [
+    {
+      "name": "run_tests",
+      "description": "Run Odoo tests on the workspace target module.",
+      "script": "./scripts/run_tests.py"
+    }
+  ]
+}

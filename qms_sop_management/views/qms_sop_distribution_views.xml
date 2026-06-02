@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Distribution Action -->
+    <record id="action_qms_sop_distribution" model="ir.actions.act_window">
+        <field name="name">SOP Copy Distributions</field>
+        <field name="res_model">qms.sop.distribution</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register a new SOP Copy Issuance
+            </p>
+            <p>
+                Track printed copies issued to departments, usage locations, and ensure they are recalled when obsolete.
+            </p>
+        </field>
+    </record>
+
+    <!-- Distribution List View -->
+    <record id="view_qms_sop_distribution_list" model="ir.ui.view">
+        <field name="name">qms.sop.distribution.list</field>
+        <field name="model">qms.sop.distribution</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'issued'" decoration-danger="state == 'recalled'">
+                <field name="name"/>
+                <field name="sop_id"/>
+                <field name="print_type" widget="badge"/>
+                <field name="department_id"/>
+                <field name="usage_location"/>
+                <field name="print_qty"/>
+                <field name="date_printed"/>
+                <field name="state" widget="badge" decoration-success="state == 'issued'" decoration-danger="state == 'recalled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Distribution Form View -->
+    <record id="view_qms_sop_distribution_form" model="ir.ui.view">
+        <field name="name">qms.sop.distribution.form</field>
+        <field name="model">qms.sop.distribution</field>
+        <field name="arch" type="xml">
+            <form string="SOP Copy Distribution">
+                <header>
+                    <button name="action_print_copy" string="Print Copy" type="object" class="btn-primary" invisible="state != 'issued'" icon="fa-print"/>
+                    <button name="action_recall" string="Recall Copy" type="object" class="btn-danger" invisible="state != 'issued'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="issued,recalled"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group string="Document Details">
+                        <group>
+                            <field name="sop_id" readonly="state != 'issued'"/>
+                            <field name="print_type" readonly="state != 'issued'"/>
+                        </group>
+                        <group>
+                            <field name="print_qty" readonly="state != 'issued'"/>
+                            <field name="date_printed" readonly="state != 'issued'"/>
+                            <field name="user_id" widget="many2one_avatar_user" readonly="state != 'issued'"/>
+                        </group>
+                    </group>
+                    <group string="Distribution Target">
+                        <group>
+                            <field name="department_id" readonly="state != 'issued'"/>
+                            <field name="usage_location" readonly="state != 'issued'"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'issued'"/>
+                        </group>
+                    </group>
+                    <group string="Recall Information" invisible="state != 'recalled'">
+                        <group>
+                            <field name="date_recalled"/>
+                            <field name="recaller_id" widget="many2one_avatar_user"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Distribution Search View -->
+    <record id="view_qms_sop_distribution_search" model="ir.ui.view">
+        <field name="name">qms.sop.distribution.search</field>
+        <field name="model">qms.sop.distribution</field>
+        <field name="arch" type="xml">
+            <search string="Search Distributions">
+                <field name="name"/>
+                <field name="sop_id"/>
+                <field name="usage_location"/>
+                <filter name="issued" string="Active Copy" domain="[('state', '=', 'issued')]"/>
+                <filter name="recalled" string="Recalled Copy" domain="[('state', '=', 'recalled')]"/>
+                <separator/>
+                <filter name="controlled" string="Controlled" domain="[('print_type', '=', 'controlled')]"/>
+                <filter name="reference" string="Reference" domain="[('print_type', '=', 'reference')]"/>
+                <filter name="uncontrolled" string="Uncontrolled" domain="[('print_type', '=', 'uncontrolled')]"/>
+                <group>
+                    <filter name="group_sop" string="SOP" context="{'group_by': 'sop_id'}"/>
+                    <filter name="group_type" string="Print Type" context="{'group_by': 'print_type'}"/>
+                    <filter name="group_dept" string="Department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>
