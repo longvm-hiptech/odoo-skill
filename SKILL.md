@@ -6,6 +6,11 @@ description: |
   "new model", "custom module", requirement document, spec sheet.
   Focus: Odoo 18+ (Enterprise & Community).
 
+  Also covers PreSale/Solution-Consulting tasks (discovery, demo,
+  fit-gap, estimation, proposal/SOW, competitor comparison, VN
+  compliance) — see "PreSale / Solution Consulting Workflow" section
+  below, which branches to agents/odoo-presales-consultant.md.
+
   ALWAYS follow the workflow in this file step by step.
   DO NOT skip requirement analysis phase.
 ---
@@ -33,6 +38,44 @@ Skill files reference generic tool names. Map to your platform:
 | browse_url | `browser_navigate` + `browser_snapshot` | Manual | `curl` |
 | run_command | `terminal` | Terminal | `Terminal` |
 | list_files | `search_files(target='files')` | `@codebase` | `ls`/`glob` |
+
+---
+
+## PreSale / Solution Consulting Workflow
+
+```
+╔═══════════════════════════════════════════════════════════════════════╗
+║  Is this a PRESALES / SOLUTION CONSULTING task?                       ║
+║  (discovery, demo, fit-gap, estimation, proposal/SOW, competitor      ║
+║   comparison, VN compliance Q&A) — NOT code/module generation.        ║
+║                                                                         ║
+║  → Do NOT follow REQUIRED WORKFLOW below.                             ║
+║  → Load `agents/odoo-presales-consultant.md` and follow its phases.   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+```
+
+PreSale skill files (flat in `skills/`, prefix `presales-`/`l10n-`/`vietnam-`):
+
+| Nhóm | File | Dùng khi nào |
+|---|---|---|
+| Discovery | `presales-discovery-questionnaire.md` | Khảo sát yêu cầu khách hàng theo từng khối nghiệp vụ |
+| Solution Mapping | `odoo-app-feature-matrix.md` | Tra "Odoo có làm được X không, App nào, Community/Enterprise" |
+| Solution Mapping | `presales-fit-gap-analysis-guide.md` | Phân loại Fit/Gap, template bảng Fit-Gap |
+| Solution Mapping | `presales-industry-solution-templates.md` | Blueprint giải pháp dựng sẵn theo 6 ngành phổ biến VN |
+| Demo | `presales-demo-environment-guide.md` | Chuẩn bị môi trường + kịch bản demo |
+| Proposal | `presales-proposal-sow-templates.md` | Template Technical/Commercial Proposal + SOW |
+| Proposal | `presales-effort-estimation-guide.md` | Benchmark effort (man-day) cho ước lượng |
+| Proposal | `odoo-licensing-deployment-guide.md` | Mô hình giá Enterprise, Online/Odoo.sh/On-premise |
+| Cạnh tranh | `presales-competitor-comparison-guide.md` | So sánh đối thủ + battle card xử lý objection |
+| VN Localization | `l10n-vietnam-compliance-guide.md` | Kế toán/thuế/hoá đơn điện tử VN (`l10n_vn`) |
+| VN Localization | `vietnam-integration-landscape.md` | Bản đồ tích hợp 3rd-party phổ biến tại VN |
+| VN Localization | `presales-glossary-vi.md` | Từ điển song ngữ Anh-Việt thuật ngữ Odoo/ERP |
+| Migration & Handoff | `presales-data-migration-scoping-guide.md` | Scoping di chuyển dữ liệu từ hệ thống cũ |
+| Migration & Handoff | `presales-to-implementation-handoff-guide.md` | Chuyển Fit-Gap + Proposal → `REQUIREMENT_SPEC.md` |
+
+**Slash commands:** `/odoo-presales-discovery [industry]`, `/odoo-fit-gap`, `/odoo-proposal`.
+
+**Vòng lặp khép kín:** PreSale Phase 5 (Handoff) tạo ra `REQUIREMENT_SPEC.md` theo đúng format ở **Step 1.3** bên dưới — đây là điểm bàn giao cho `agents/odoo-planner.md` và REQUIRED WORKFLOW của file này.
 
 ---
 
@@ -265,3 +308,4 @@ Load these files as needed based on task:
 4. **Update PLAN.md after every task** — never let it go stale
 5. **Security: every model needs access rights** — no exceptions
 6. **Odoo 18+ patterns only** — no deprecated attrs, @api.multi, tuple commands
+7. **Log skill errors, never silently fix** — if a skill claim is wrong, append to `CORRECTIONS_LOG.md` before continuing; run `/odoo-skill-update` when ≥ 1 pending rows exist

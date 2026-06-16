@@ -26,6 +26,7 @@ Before writing ANY Odoo code:
 When uncertain about version-specific syntax, verify against the official Odoo GitHub repo:
 - Raw URL: `https://raw.githubusercontent.com/odoo/odoo/{version}/addons/{module}/models/{file}`
 - Use browser tool or curl to fetch reference files
+- **If a skill claim turns out to be wrong → log it in `CORRECTIONS_LOG.md` before continuing** (see Section 8)
 
 ### Step 4: Generate Code
 Follow version-specific patterns from loaded skills.
@@ -72,6 +73,7 @@ Load the appropriate agent profile for specialized tasks:
 | Version upgrade analysis | `agents/odoo-upgrade-analyzer.md` |
 | Context gathering (pre-code) | `agents/odoo-context-gatherer.md` |
 | Finding specific patterns | `agents/odoo-skill-finder.md` |
+| PreSale / Solution Consulting (discovery, fit-gap, proposal/SOW, demo, VN compliance) | `agents/odoo-presales-consultant.md` |
 
 ---
 
@@ -167,3 +169,46 @@ When user provides requirements via document (Word, Excel, text):
 - [ ] Tests generated (if requested)
 - [ ] Manifest data order: security → data → views → menus
 - [ ] Code validated (Python syntax + XML validity)
+
+---
+
+## 8. Skill Maintenance — Corrections Feedback Loop
+
+### Rule: Log before you fix
+
+Whenever a skill claim in `skills/` is found to be **wrong or outdated** during real dev work:
+
+1. **Do NOT edit the skill file directly** during the dev session.
+2. **Append one row** to `CORRECTIONS_LOG.md` (root):
+
+   ```
+   | YYYY-MM-DD | skills/file.md | Section | Wrong claim | Correct claim | Source |
+   ```
+
+3. Continue the dev task using the correct pattern.
+4. When the session ends (or after completing a full module), check `CORRECTIONS_LOG.md`:
+   - If ≥ 1 pending row → **suggest running `/odoo-skill-update`** to the user.
+
+### Rule: New runtime error not yet in troubleshooting guide
+
+If you hit a runtime/dev error that is not in `skills/odoo-troubleshooting-guide.md`:
+
+1. Add a row to `CORRECTIONS_LOG.md` with the error + fix (Section = "NEW — troubleshooting-guide").
+2. `/odoo-skill-update` will promote it to the guide on the next run.
+
+### `/odoo-skill-update` command
+
+See `commands/odoo-skill-update.md` for the full flow. In short:
+
+```
+Read CORRECTIONS_LOG → Verify claims vs GitHub source → Patch skill files
+→ Prune duplicate troubleshooting entries → Clear log → Open PR to main
+```
+
+Run: after completing a module, or when CORRECTIONS_LOG has ≥ 3 pending rows, or monthly.
+
+### Version file structure (do not consolidate)
+
+Each Odoo version keeps its own skill files (`-18.md`, `-19.md`, `-18-19.md` for migration notes).
+Do NOT merge version files — breaking changes between versions make them incompatible.
+Staleness sweeps (version headers, GitHub branch names) are handled automatically by `/odoo-skill-update`.

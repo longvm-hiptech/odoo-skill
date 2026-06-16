@@ -26,6 +26,24 @@ The workspace is organized to promote the Odoo development skills, agents, comma
 
 ---
 
+## 🤝 PreSale / Solution Consulting Track
+
+Bên cạnh nhánh **Developer** (sinh module, pattern code...), workspace này có thêm nhánh **PreSale / Solution Consulting** dành cho đội tư vấn giải pháp tại Việt Nam — từ khảo sát khách hàng đến bàn giao cho đội Dev:
+
+```
+Discovery → Solution Mapping & Fit-Gap → Demo → Estimation & Proposal/SOW
+   → (VN Compliance check nếu cần) → Handoff (REQUIREMENT_SPEC.md) → Dev team
+```
+
+- **Entry point**: `agents/odoo-presales-consultant.md` — role "Senior Odoo PreSales Consultant", điều phối qua 5 phase ở trên (xem cũng mục "PreSale / Solution Consulting Workflow" trong `SKILL.md`).
+- **Skill files** (flat trong `skills/`, prefix `presales-`/`l10n-`/`vietnam-`): bộ câu hỏi khảo sát, feature matrix Apps Odoo, phương pháp Fit-Gap, blueprint theo 6 ngành phổ biến, demo guide, effort estimation, licensing/deployment, competitor battle card, và localization Việt Nam (kế toán/hoá đơn điện tử/tích hợp ngân hàng-vận chuyển-thanh toán).
+- **Slash commands**: `/odoo-presales-discovery [industry]`, `/odoo-fit-gap`, `/odoo-proposal`.
+- **Vòng lặp khép kín**: output cuối cùng (`REQUIREMENT_SPEC.md`) tương thích trực tiếp với `agents/odoo-planner.md` ở nhánh Developer — xem `skills/presales-to-implementation-handoff-guide.md`.
+
+Tất cả các platform tích hợp ở mục dưới đây (Cursor, Hermes, Gemini, Codex...) đều tự động có quyền truy cập nhánh PreSale này vì nó nằm cùng cấu trúc `skills/`/`agents/`/`commands/` flat với nhánh Developer.
+
+---
+
 ## 🛠️ Multi-Agent Setup Guide
 
 Here is how to configure and load this repository with various AI agents and IDEs:
