@@ -166,19 +166,20 @@ def _compute_partner_orders(self):
             ('partner_id', '=', record.partner_id.id)
         ])
 
-# GOOD: Batch query with read_group
+# GOOD: Batch query with _read_group (v17+ API)
 @api.depends('partner_id')
 def _compute_partner_orders(self):
     if not self:
         return
 
     partner_ids = self.mapped('partner_id').ids
-    order_data = self.env['sale.order'].read_group(
+    # _read_group returns list of (group_record, agg_value) tuples in v17+
+    counts_data = self.env['sale.order']._read_group(
         [('partner_id', 'in', partner_ids)],
-        ['partner_id'],
-        ['partner_id'],
+        groupby=['partner_id'],
+        aggregates=['__count'],
     )
-    counts = {d['partner_id'][0]: d['partner_id_count'] for d in order_data}
+    counts = {partner.id: count for partner, count in counts_data}
 
     for record in self:
         record.order_count = counts.get(record.partner_id.id, 0)
