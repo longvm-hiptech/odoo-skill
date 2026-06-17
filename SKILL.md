@@ -254,6 +254,9 @@ Load these files as needed based on task:
 | OWL / JavaScript / frontend | `skills/odoo-owl-components-18.md` |
 | Tests | `skills/odoo-test-patterns.md` |
 | Performance | `skills/odoo-performance-guide.md` |
+| Performance profiling (werkzeug log, profiler, Speedscope) | `skills/odoo-profiling-guide.md` |
+| PostgreSQL indexing (EXPLAIN, index types, Odoo index attr) | `skills/postgresql-indexing-guide.md` |
+| Advanced ORM (cache, prefetch, _read_group, _search, any) | `skills/odoo-advanced-orm-patterns.md` |
 | Troubleshooting | `skills/odoo-troubleshooting-guide.md` |
 | Onchange, dynamic domain | `skills/onchange-dynamic-patterns.md` |
 | Inheritance | `skills/inheritance-patterns.md` |

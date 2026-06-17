@@ -424,15 +424,15 @@ def process_state(self) -> str:
 
 ```
 # SQL builder (required)
-https://raw.githubusercontent.com/odoo/odoo/master/odoo/tools/sql.py
+https://raw.githubusercontent.com/odoo/odoo/19.0/odoo/tools/sql.py
 
 # OWL 3.x
-https://raw.githubusercontent.com/odoo/odoo/master/addons/web/static/src/core/
+https://raw.githubusercontent.com/odoo/odoo/19.0/addons/web/static/src/core/
 
 # Type hints in core
-https://raw.githubusercontent.com/odoo/odoo/master/odoo/models.py
+https://raw.githubusercontent.com/odoo/odoo/19.0/odoo/models.py
 
-# Note: v19 uses 'master' branch until release
+# v19 is stable (released Oct 2025) — use branch 19.0
 ```
 
 ## Migration Checklist

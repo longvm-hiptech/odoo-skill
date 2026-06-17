@@ -10,16 +10,20 @@
 
 ## View Types Overview
 
-| View Type | Purpose | Element |
-|-----------|---------|---------|
-| Form | Single record editing | `<form>` |
-| Tree/List | Multiple records display | `<tree>` |
-| Kanban | Card-based view | `<kanban>` |
-| Search | Filtering/grouping | `<search>` |
-| Graph | Charts/analytics | `<graph>` |
-| Pivot | Pivot tables | `<pivot>` |
-| Calendar | Date-based display | `<calendar>` |
-| Gantt | Timeline view | `<gantt>` |
+| View Type | Purpose | Element (v14-v18) | Element (v19+) |
+|-----------|---------|-------------------|----------------|
+| Form | Single record editing | `<form>` | `<form>` |
+| Tree/List | Multiple records display | `<tree>` | `<list>` ⚠️ renamed |
+| Kanban | Card-based view | `<kanban>` | `<kanban>` |
+| Search | Filtering/grouping | `<search>` | `<search>` |
+| Graph | Charts/analytics | `<graph>` | `<graph>` |
+| Pivot | Pivot tables | `<pivot>` | `<pivot>` |
+| Calendar | Date-based display | `<calendar>` | `<calendar>` |
+| Gantt | Timeline view | `<gantt>` | `<gantt>` |
+
+> **v19 BREAKING**: `<tree>` renamed to `<list>` for list/tree views. Also `view_mode` strings
+> change from `'tree,form'` to `'list,form'`. The `<dashboard>` view type is Enterprise-only —
+> not available in Community Edition.
 
 ---
 
@@ -38,15 +42,20 @@
             <sheet>
                 <!-- Main content -->
             </sheet>
+            <!-- v14-v18: chatter div -->
             <div class="oe_chatter">
-                <!-- Mail integration -->
+                <field name="message_follower_ids"/>
+                <field name="activity_ids"/>
+                <field name="message_ids"/>
             </div>
+            <!-- v19+: self-closing <chatter/> replaces the whole div above -->
+            <!-- <chatter/> -->
         </form>
     </field>
 </record>
 ```
 
-### Complete Form Example (v18)
+### Complete Form Example (v18 — use `<list>` and `<chatter/>` for v19)
 ```xml
 <record id="my_model_view_form" model="ir.ui.view">
     <field name="name">my.model.form</field>
@@ -194,8 +203,11 @@
 
 ## Tree/List View
 
-### Basic Tree
+> **v19**: Use `<list>` element instead of `<tree>`. `view_mode` must be `'list,form'` not `'tree,form'`.
+
+### Basic List (v19+) / Tree (v14-v18)
 ```xml
+<!-- v14-v18 -->
 <record id="my_model_view_tree" model="ir.ui.view">
     <field name="name">my.model.tree</field>
     <field name="model">my.model</field>
@@ -209,11 +221,26 @@
         </tree>
     </field>
 </record>
+
+<!-- v19+ -->
+<record id="my_model_view_list" model="ir.ui.view">
+    <field name="name">my.model.list</field>
+    <field name="model">my.model</field>
+    <field name="arch" type="xml">
+        <list>
+            <field name="name"/>
+            <field name="partner_id"/>
+            <field name="date"/>
+            <field name="state"/>
+            <field name="amount" sum="Total"/>
+        </list>
+    </field>
+</record>
 ```
 
-### Advanced Tree (v17+)
+### Advanced Tree (v17+) / List (v19+)
 ```xml
-<tree decoration-danger="state == 'cancel'"
+<list decoration-danger="state == 'cancel'"
       decoration-warning="state == 'draft'"
       decoration-success="state == 'done'"
       default_order="date desc">
@@ -228,17 +255,18 @@
     <field name="amount" sum="Total"/>
     <field name="company_id" column_invisible="True"/>
     <field name="internal_notes" optional="hide"/>
-</tree>
+</list>
 ```
 
-### Editable Tree
+### Editable List (v19) / Tree (v14-v18)
 ```xml
-<tree editable="bottom">  <!-- or "top" -->
+<!-- v19 -->
+<list editable="bottom">  <!-- or "top" -->
     <field name="product_id"/>
     <field name="quantity"/>
     <field name="price_unit"/>
     <field name="subtotal" readonly="1"/>
-</tree>
+</list>
 ```
 
 ### Column Visibility (v17+)
@@ -493,7 +521,8 @@
 <record id="my_model_action" model="ir.actions.act_window">
     <field name="name">My Models</field>
     <field name="res_model">my.model</field>
-    <field name="view_mode">tree,form,kanban</field>
+    <!-- v19: use 'list' not 'tree' -->
+    <field name="view_mode">list,form,kanban</field>
     <field name="domain">[('active', '=', True)]</field>
     <field name="context">{'search_default_my_records': 1}</field>
     <field name="help" type="html">
@@ -556,11 +585,14 @@
 
 ## Version-Specific Summary
 
-| Feature | v14-v16 | v17+ |
-|---------|---------|------|
-| Visibility | `attrs="{'invisible': [...]}"` | `invisible="expr"` |
-| Readonly | `attrs="{'readonly': [...]}"` | `readonly="expr"` |
-| Required | `attrs="{'required': [...]}"` | `required="expr"` |
-| Column hide | N/A | `column_invisible="True"` |
-| Optional cols | Limited | `optional="show/hide"` |
-| Tree `string` attr | `string="..."` supported | Deprecated (omit it) |
+| Feature | v14-v16 | v17-v18 | v19+ |
+|---------|---------|---------|------|
+| Visibility | `attrs="{'invisible': [...]}"` | `invisible="expr"` | `invisible="expr"` |
+| Readonly | `attrs="{'readonly': [...]}"` | `readonly="expr"` | `readonly="expr"` |
+| Required | `attrs="{'required': [...]}"` | `required="expr"` | `required="expr"` |
+| Column hide | N/A | `column_invisible="True"` | `column_invisible="True"` |
+| Optional cols | Limited | `optional="show/hide"` | `optional="show/hide"` |
+| List/Tree element | `<tree>` | `<tree>` | `<list>` ⚠️ |
+| view_mode string | `'tree,form'` | `'tree,form'` | `'list,form'` ⚠️ |
+| Chatter | `<div class="oe_chatter">...` | `<div class="oe_chatter">...` | `<chatter/>` ⚠️ |
+| `states` on buttons | Supported | Deprecated | Removed — use `invisible=` |
