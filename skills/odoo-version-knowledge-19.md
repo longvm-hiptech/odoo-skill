@@ -4,8 +4,8 @@
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║  ODOO 19.0 KNOWLEDGE BASE                                                    ║
 ║  Type hints mandatory, SQL() required, OWL 3.x                               ║
-║  WARNING: v19 is in development - patterns may change                        ║
-║  VERIFY: https://github.com/odoo/odoo/tree/master                            ║
+║  NOTE: v19 is Stable (released Oct 2025); verify against branch 19.0         ║
+║  VERIFY: https://github.com/odoo/odoo/tree/19.0                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 ```
 
@@ -13,11 +13,11 @@
 
 | Aspect | Details |
 |--------|---------|
-| Release Date | October 2024 (Expected) |
-| Python | 3.11, 3.12 |
-| PostgreSQL | 14, 15, 16 |
+| Release Date | October 2025 |
+| Python | 3.12+ (3.12 recommended) |
+| PostgreSQL | 14, 15, 16, 17 |
 | Frontend | OWL 3.x |
-| Status | In Development |
+| Status | Stable |
 
 ## BREAKING Changes from v18
 
@@ -579,3 +579,24 @@ portal_group.write({'users': [(4, user.id)]})
 ```
 
 **Why**: Security hardening prevents group assignment during user creation to avoid privilege escalation.
+
+## GitHub Verification URLs (branch: 19.0)
+
+```
+# SQL builder
+https://raw.githubusercontent.com/odoo/odoo/19.0/odoo/tools/sql.py
+
+# OWL 3.x core
+https://raw.githubusercontent.com/odoo/odoo/19.0/addons/web/static/src/core/
+
+# Type hints in core models
+https://raw.githubusercontent.com/odoo/odoo/19.0/odoo/models.py
+
+# models.Constraint() class
+https://raw.githubusercontent.com/odoo/odoo/19.0/odoo/fields.py
+
+# Reference sale order (complex real-world model)
+https://raw.githubusercontent.com/odoo/odoo/19.0/addons/sale/models/sale_order.py
+```
+
+> Last verified: 2026-06-16 against branch `19.0`

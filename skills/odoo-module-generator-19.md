@@ -5,7 +5,7 @@
 ║  ODOO 19.0 MODULE GENERATION PATTERNS                                        ║
 ║  This file contains ONLY Odoo 19.0 specific patterns.                        ║
 ║  DO NOT use these patterns for other versions.                               ║
-║  Note: v19 is in DEVELOPMENT - patterns may change before release.           ║
+║  v19 is Stable (released Oct 2025). Verify against branch 19.0.             ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 ```
 
@@ -173,9 +173,11 @@ class {ModelName}(models.Model):
             if record.amount < 0:
                 raise ValidationError(_("Amount must be positive."))
 
-    _sql_constraints = [
-        ('name_uniq', 'unique(company_id, name)', 'Name must be unique per company!'),
-    ]
+    # v19: models.Constraint() replaces _sql_constraints list
+    _name_uniq = models.Constraint(
+        'unique(company_id, name)',
+        'Name must be unique per company!',
+    )
 
     # === CRUD METHODS (v19 - Type hints mandatory) === #
     @api.model_create_multi
@@ -283,7 +285,7 @@ class {ModelName}(models.Model):
         return {
             'type': 'ir.actions.act_window',
             'res_model': '{module_name}.{model_name}',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('partner_id', '=', self.partner_id.id)],
             'context': {'default_partner_id': self.partner_id.id},
         }
@@ -331,22 +333,20 @@ class {ModelName}(models.Model):
                     <notebook>
                         <page string="Lines" name="lines">
                             <field name="line_ids">
-                                <tree editable="bottom">
+                                <!-- v19: use <list> not <tree> -->
+                                <list editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
                                     <field name="quantity"/>
                                     <field name="price_unit"/>
                                     <field name="amount"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </div>
+                <!-- v19: replace oe_chatter div with <chatter/> tag -->
+                <chatter/>
             </form>
         </field>
     </record>

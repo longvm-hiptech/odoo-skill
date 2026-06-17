@@ -18,6 +18,21 @@
 
 ---
 
+## Critical: QWeb Template Tag
+
+> **ALWAYS use `<template id="...">` — NEVER use `<t id="...">` for report templates.**
+> Using `<t id="...">` causes silent failures in Odoo 19 where the template is not registered.
+
+```xml
+<!-- WRONG -->
+<t id="report_my_model_document">...</t>
+
+<!-- CORRECT -->
+<template id="report_my_model_document">...</template>
+```
+
+---
+
 ## Basic Report Structure
 
 ### File Organization

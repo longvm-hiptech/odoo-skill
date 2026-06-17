@@ -5,7 +5,7 @@
 ║  ODOO 19.0 SECURITY PATTERNS                                                 ║
 ║  This file contains ONLY Odoo 19.0 specific patterns.                        ║
 ║  DO NOT use these patterns for other versions.                               ║
-║  NOTE: Odoo 19.0 is in DEVELOPMENT - patterns may change.                    ║
+║  NOTE: Odoo 19.0 is Stable (released Oct 2025). Verify against branch 19.0.  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 ```
 
@@ -16,6 +16,12 @@
 
 ## Security Groups (v19 Syntax)
 
+> **v19 BREAKING CHANGE**: `res.groups.category_id` was renamed to `privilege_id` in v19.
+> Use `privilege_id` to link a group to its `ir.module.category`. Always set this — groups
+> without `privilege_id` appear ungrouped under "Other" in the UI.
+>
+> **v19 NOTE**: To access users of a group, use `group.user_ids` (not `group.users`).
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
@@ -24,17 +30,29 @@
         <field name="sequence">100</field>
     </record>
 
+    <!-- v19: use privilege_id (NOT category_id) -->
     <record id="group_custom_user" model="res.groups">
         <field name="name">User</field>
-        <field name="category_id" ref="module_category_custom"/>
+        <field name="privilege_id" ref="module_category_custom"/>
     </record>
 
     <record id="group_custom_manager" model="res.groups">
         <field name="name">Manager</field>
-        <field name="category_id" ref="module_category_custom"/>
+        <field name="privilege_id" ref="module_category_custom"/>
         <field name="implied_ids" eval="[(4, ref('group_custom_user'))]"/>
     </record>
 </odoo>
+```
+
+### Accessing Group Users in Python (v19)
+
+```python
+# WRONG in v19
+group = self.env.ref('my_module.group_custom_manager')
+users = group.users  # AttributeError
+
+# CORRECT in v19
+users = group.user_ids
 ```
 
 ## Access Rights (v19)
@@ -47,10 +65,22 @@ access_custom_model_manager,custom.model.manager,model_custom_model,custom_modul
 
 ## Record Rules (v19 Syntax)
 
+> **v19 BREAKING CHANGE**: `ir.rule.group_id` (Many2one) was replaced by `groups`
+> (Many2many) in v19. Use `<field name="groups" eval="[(4, ref('...'))]"/>` when
+> restricting a rule to specific groups.
+
 ### Multi-Company Rule (v19)
 
 ```xml
-<!-- v19: Enhanced multi-company with allowed_company_ids -->
+<!-- v19: group_id → groups (Many2many) -->
+<record id="rule_custom_model_user" model="ir.rule">
+    <field name="name">Custom Model: Users only</field>
+    <field name="model_id" ref="model_custom_model"/>
+    <field name="groups" eval="[(4, ref('my_module.group_custom_user'))]"/>
+    <field name="domain_force">[('user_id', '=', user.id)]</field>
+</record>
+
+<!-- v19: Multi-company rule (global = no group restriction) -->
 <record id="rule_custom_model_company" model="ir.rule">
     <field name="name">Custom Model: Multi-Company</field>
     <field name="model_id" ref="model_custom_model"/>
@@ -339,4 +369,4 @@ When generating Odoo 19.0 security code:
 6. **Use** `allowed_company_ids` in record rules
 7. **Use** direct `invisible` attribute (no `attrs`)
 8. **Use** Python 3.12+ features where appropriate
-9. **Verify** patterns against `master` branch of odoo/odoo GitHub
+9. **Verify** patterns against `19.0` branch of odoo/odoo GitHub (NOT master)

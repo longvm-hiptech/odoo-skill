@@ -14,9 +14,17 @@
 |---------------|--------------|---------|----------|
 | `'api' has no attribute 'multi'` | Using @api.multi | v15+ | Remove decorator |
 | `attrs attribute is no longer supported` | Using attrs= | v17+ | Use invisible= |
+| `states attribute is not allowed` | Using states= on button | v17+ | Use invisible= |
 | `create() takes 2 positional arguments` | Single create() | v17+ | Use @api.model_create_multi |
 | `check_company failed` | Cross-company relation | v18+ | Add check_company=True |
 | `SQL string query deprecated` | String SQL | v19 | Use SQL() builder |
+| `<tree> not recognized` / view parse error | Using `<tree>` tag | v19 | Use `<list>` tag |
+| Form renders without chatter | Old chatter div syntax | v19 | Use `<chatter/>` tag |
+| `'purchase.order' has no attribute 'refresh'` | Wrong method name | v19 | Use invalidate_recordset() |
+| `_read_group() missing argument` | Missing aggregate specs | v19 | Pass `['__count']` as 2nd arg |
+| `digits` TypeError / list not accepted | Wrong digits format | v19 | Use tuple (16, 2) or omit |
+| `<list> inside One2many` parse error | Inline list in O2m | v19 | Use separate view reference |
+| `<dashboard> unknown view type` | Dashboard not in CE | v19 CE | Use form + oe_button_box |
 | `External ID not found` | Missing XML reference | All | Check file order in manifest |
 | `Access Denied` | Missing security rules | All | Add ir.model.access.csv |
 | `KeyError: 'field_name'` | Field not in vals | All | Use .get() or check field |
@@ -661,6 +669,286 @@ with QueryCounter(self.env.cr) as qc:
     # Your code
     pass
 print(f"Queries: {qc.count}")
+```
+
+---
+
+---
+
+## v19-Specific Runtime Errors
+
+### Error: `states` attribute is not allowed on button elements
+
+**Cause**: `states` attribute removed in v17+ for buttons (and all elements)
+
+**Wrong (v14-v16)**:
+```xml
+<button name="action_confirm" string="Confirm" states="draft"/>
+```
+
+**Correct (v17+)**:
+```xml
+<button name="action_confirm" string="Confirm" invisible="state != 'draft'"/>
+```
+
+---
+
+### Error: `<tree>` element not recognized / view parse error in v19
+
+**Cause**: `<tree>` renamed to `<list>` in v19; `view_mode='tree,form'` also invalid
+
+**Wrong (v14-v18)**:
+```xml
+<tree>...</tree>
+<!-- and in actions: -->
+<field name="view_mode">tree,form</field>
+```
+
+**Correct (v19)**:
+```xml
+<list>...</list>
+<!-- and in actions: -->
+<field name="view_mode">list,form</field>
+```
+
+---
+
+### Error: Form renders without chatter / messaging section missing
+
+**Cause**: v19 requires `<chatter/>` self-closing tag instead of the old `<div class="oe_chatter">` block
+
+**Wrong (v14-v18 style in v19 context)**:
+```xml
+<div class="oe_chatter">
+    <field name="message_follower_ids"/>
+    <field name="activity_ids"/>
+    <field name="message_ids"/>
+</div>
+```
+
+**Correct (v19)**:
+```xml
+<chatter/>
+```
+
+Place `<chatter/>` after `</sheet>`, before `</form>`.
+
+---
+
+### Error: `ir.cron` field AttributeError — `numbercall`, `hour`, `minute` not found
+
+**Cause**: `ir.cron` was restructured in v19 — it now fully inherits `ir.actions.server` and no longer
+has `numbercall`, `hour`, `minute`, `dayofweek`, etc. as direct fields.
+
+**Wrong (v14-v18)**:
+```xml
+<record id="my_cron" model="ir.cron">
+    <field name="name">My Scheduled Action</field>
+    <field name="model_id" ref="model_my_model"/>
+    <field name="code">model.action_run()</field>
+    <field name="interval_number">1</field>
+    <field name="interval_type">days</field>
+    <field name="numbercall">-1</field>
+</record>
+```
+
+**Correct (v19)**: Use `ir.actions.server` schedule fields — check official v19 `ir.cron` definition for the current field API.
+
+---
+
+### Error: `AttributeError: 'purchase.order' object has no attribute 'refresh'`
+
+**Cause**: No `refresh()` method exists on Odoo models; `invalidate_recordset()` is the correct way to clear the ORM cache.
+
+**Wrong**:
+```python
+order.refresh()
+```
+
+**Correct**:
+```python
+order.invalidate_recordset()
+```
+
+---
+
+### Error: `_read_group() missing 1 required positional argument` or wrong result count
+
+**Cause**: `_read_group` API changed in v19 — requires explicit aggregate specifications
+
+**Wrong (v14-v18)**:
+```python
+result = self.env['my.model']._read_group([('state', '=', 'draft')], ['state'])
+```
+
+**Correct (v19)**:
+```python
+result = self.env['my.model']._read_group(
+    [('state', '=', 'draft')],
+    groupby=['state'],
+    aggregates=['__count'],
+)
+```
+
+---
+
+### Error: `TypeError: digits argument must be a tuple, not list`
+
+**Cause**: `digits` parameter on Float fields does not accept lists or named tuples like `[('Tax Rate', 2)]`
+
+**Wrong**:
+```python
+amount = fields.Float(digits=[('Tax Rate', 2)])
+tax_rate = fields.Float(digits=('Tax Rate', 2))  # named tuple also wrong
+```
+
+**Correct**:
+```python
+amount = fields.Float(digits=(16, 2))   # simple (total_digits, decimal_places)
+# or omit for default precision
+tax_rate = fields.Float()
+# or use a precision parameter name string
+tax_rate = fields.Float(digits='Product Price')
+```
+
+---
+
+### Error: Inline `<list>` inside One2many field not supported
+
+**Cause**: Inline `<list>` (formerly `<tree>`) directly inside a One2many field definition is not supported in v19.
+
+**Wrong**:
+```xml
+<field name="line_ids">
+    <list editable="bottom">
+        <field name="name"/>
+    </list>
+</field>
+```
+
+**Correct**: Define a separate list view and reference it:
+```xml
+<!-- Separate view definition -->
+<record id="my_line_view_list" model="ir.ui.view">
+    <field name="name">my.line.list</field>
+    <field name="model">my.model.line</field>
+    <field name="arch" type="xml">
+        <list editable="bottom">
+            <field name="name"/>
+        </list>
+    </field>
+</record>
+
+<!-- Reference in parent form -->
+<field name="line_ids" mode="list,form"/>
+```
+
+---
+
+### Error: `<dashboard>` view type not available / unknown view type
+
+**Cause**: `<dashboard>` is an Enterprise-only view type; not available in Odoo 19 Community Edition.
+
+**Workaround (CE)**: Use a form view with `oe_button_box` for stat buttons / KPI navigation:
+```xml
+<form>
+    <sheet>
+        <div class="oe_button_box" name="button_box">
+            <button class="oe_stat_button" icon="fa-list">
+                <field name="order_count" widget="statinfo" string="Orders"/>
+            </button>
+        </div>
+    </sheet>
+</form>
+```
+
+---
+
+### Error: `stock.move` field AttributeError — `name`, `quantity_done`, `product_uom_id` wrong
+
+**Cause**: Several `stock.move` fields changed in v19:
+
+| Old field (v14-v18) | v19 replacement |
+|---------------------|-----------------|
+| `name` | `description_picking` |
+| `quantity_done` | `quantity` |
+| `product_uom_id` | `product_uom` |
+
+```python
+# Wrong (v14-v18)
+move.name = "description"
+move.quantity_done = 5.0
+uom = move.product_uom_id
+
+# Correct (v19)
+move.description_picking = "description"
+move.quantity = 5.0
+uom = move.product_uom
+```
+
+---
+
+### Error: `%(xml_id)d` forward reference fails within same XML file
+
+**Cause**: `%(xml_id)d` references that point forward to records defined later in the same XML file fail at load time.
+
+**Wrong**: Defining an action that references a view in the same file, where the view comes after the action.
+
+**Correct**: Split into separate files — define views/actions that are referenced in a file loaded earlier in the manifest:
+```python
+'data': [
+    'views/my_model_views.xml',   # defines the view
+    'views/menu_actions.xml',     # references the view — must come AFTER
+]
+```
+
+---
+
+### Error: `purchase.order.line` field AttributeError — `product_uom`, `taxes_id` not found
+
+**Cause**: `purchase.order.line` field names changed in v19:
+
+| Old field (v14-v18) | v19 replacement |
+|---------------------|-----------------|
+| `product_uom` | `product_uom_id` |
+| `taxes_id` | `tax_ids` |
+
+```python
+# Correct (v19)
+line.product_uom_id = uom
+line.tax_ids = tax_records
+```
+
+---
+
+### Error: `purchase.order.date_planned` type mismatch — expected Datetime
+
+**Cause**: `date_planned` on `purchase.order` is a **Datetime** field (not Date) in v19.
+
+```python
+# Wrong
+order.date_planned = fields.Date.today()
+
+# Correct
+order.date_planned = fields.Datetime.now()
+# or
+from datetime import datetime
+order.date_planned = datetime(2026, 6, 16, 12, 0, 0)
+```
+
+---
+
+### Error: `res.partner` has no attribute `vendor` — AttributeError
+
+**Cause**: `res.partner.vendor` boolean field was removed in v14+. No direct `vendor` boolean exists.
+
+**Correct approach**:
+```python
+# Check if partner is a company (closest equivalent)
+is_company = partner.is_company
+
+# Or filter by supplier_rank for purchase vendor context
+suppliers = self.env['res.partner'].search([('supplier_rank', '>', 0)])
 ```
 
 ---
